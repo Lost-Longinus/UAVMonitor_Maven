@@ -23,6 +23,7 @@ public class CollectFlow {
 		boolean isStart=true;//该变量建议设置为全局控制变量，用于控制录制结束
 		// 获取视频源
 		FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
+		System.out.println("音频： "+grabber.hasAudio()+" 视频： "+grabber.hasVideo());
 		// 流媒体输出地址，分辨率（长，高），是否录制音频（0:不录制/1:录制）
 		FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputFile, 1280, 720, audioChannel);
 		// 开始取视频源
@@ -36,6 +37,7 @@ public class CollectFlow {
 			recorder.start();
 			Frame frame = null;
 			while (status&& (frame = grabber.grabFrame()) != null) {
+				System.out.println(frame.samples);
 				recorder.record(frame);
 			}
 			recorder.stop();
@@ -47,3 +49,4 @@ public class CollectFlow {
 		}
 	}
 }
+
