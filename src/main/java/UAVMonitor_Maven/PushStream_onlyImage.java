@@ -14,7 +14,7 @@ import java.awt.*;
  * Hello world!
  *
  */
-public class PushStream
+public class PushStream_onlyImage
 {
     public static void main( String[] args ) throws Exception {
         //录制的mp4文件无法播放，格式问题，录制为flv格式即可！！！
@@ -65,7 +65,7 @@ public class PushStream
             //videoTS = 1000 * (System.currentTimeMillis() - startTime);
             //recorder.setTimestamp(videoTS);
             //recorder.record(rotatedFrame);
-            Thread.sleep(10);
+            //Thread.sleep(10);
         }
         myframe.dispose();
         //recorder.stop();

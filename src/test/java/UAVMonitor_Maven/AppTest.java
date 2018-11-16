@@ -3,6 +3,7 @@ package UAVMonitor_Maven;
 import org.bytedeco.javacv.*;
 import org.junit.Test;
 
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 
 /**
@@ -10,9 +11,10 @@ import javax.swing.*;
  */
 public class AppTest 
 {
-    public static void main(String[] args) throws FrameGrabber.Exception, InterruptedException {
-        AppTest appTest = new AppTest();
-        appTest.testCamera();
+    public static void main(String[] args) throws FrameGrabber.Exception, InterruptedException, LineUnavailableException {
+        String inputFile = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
+        App app = new App();
+        app.getAudio(inputFile);
     }
     public void testCamera() throws InterruptedException, FrameGrabber.Exception {
         /*以下源测试可用

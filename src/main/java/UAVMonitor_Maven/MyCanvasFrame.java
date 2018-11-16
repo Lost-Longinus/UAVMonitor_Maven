@@ -106,7 +106,7 @@ public class MyCanvasFrame extends JFrame {
 	public MyCanvasFrame(String title) {
 		this(title, 0.0D);
 	}
-
+	//需要用到的构造器
 	public MyCanvasFrame(String title, double gamma) {
 		super(title);
 		this.latency = 200L;
@@ -124,6 +124,8 @@ public class MyCanvasFrame extends JFrame {
 				return false;
 			}
 		};
+		this.setBounds(0,0,1260,540);
+		this.setResizable(false);
 		this.canvas = null;
 		this.needInitialResize = false;
 		this.initialScale = 0.5D;
@@ -211,7 +213,8 @@ public class MyCanvasFrame extends JFrame {
 					int h = displayMode.getHeight();
 					int b = displayMode.getBitDepth();
 					int r = displayMode.getRefreshRate();
-					d2 = new DisplayMode(w > 0 ? w : d.getWidth(), h > 0 ? h : d.getHeight(), b > 0 ? b : d.getBitDepth(), r > 0 ? r : d.getRefreshRate());
+					d2 = new DisplayMode(w > 0 ? w : d.getWidth(), h > 0 ? h : d.getHeight(),
+							b > 0 ? b : d.getBitDepth(), r > 0 ? r : d.getRefreshRate());
 				}
 
 				if (fullScreen) {
@@ -407,6 +410,7 @@ public class MyCanvasFrame extends JFrame {
 		Java2DFrameConverter var10003 = this.converter;
 		this.showImage((Image)this.converter.getBufferedImage(image, Java2DFrameConverter.getBufferedImageType(image) == 0 ? 1.0D : this.inverseGamma, flipChannels, (ColorSpace)null));
 	}
+
 
 	public void showImage(Image image) {
 		if (image != null) {

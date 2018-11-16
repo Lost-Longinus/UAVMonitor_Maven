@@ -5,13 +5,12 @@ import org.bytedeco.javacpp.opencv_objdetect;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.FrameGrabber;
 
+import javax.imageio.plugins.jpeg.JPEGHuffmanTable;
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 
 /**
  * Created by Pengfei Jin on 2018/11/11.
@@ -19,21 +18,10 @@ import java.nio.ShortBuffer;
 
 public class UAVM_UI {
 
-	//音频
-	private AudioFormat af = null;
-	private SourceDataLine sourceDataLine;
-	private DataLine.Info dataLineInfo;
-	Buffer[] buf;
-	ShortBuffer ILData;
-	ByteBuffer TLData;
-	float vol = 1;//音量
-	int sampleFormat;
-	byte[] tl;
-
 	public static void main( String[] args ) throws Exception {
 		//String inputFile = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
-		String inputFile = "D:\\recordef.flv";
-		String outputFile = "D:\\recorde.flv";
+		String inputFile = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
+		String outputFile = "D:\\record.flv";
 		UAVM_UI uavm_ui = new UAVM_UI();
 		uavm_ui.TVshow(inputFile, outputFile);
 	}
@@ -42,62 +30,68 @@ public class UAVM_UI {
 			throws Exception {
 		Loader.load(opencv_objdetect.class);
 		FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFile);
-		FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputFile, 1280, 720, 1);
+		//FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputFile, 1280, 720, 1);
 		grabber.start();
-		sampleFormat = grabber.getSampleFormat();
-		initSourceDataLine(grabber);
-		recorder.start();
-		long startTime=0;
+		//recorder.start();
 
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				String inputFile = "http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8";
+				App app = new App();
+				try {
+					app.getAudio(inputFile);
+				} catch (FrameGrabber.Exception e) {
+					e.printStackTrace();
+				} catch (LineUnavailableException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 
-		MyCanvasFrame myframe = new MyCanvasFrame("camera", MyCanvasFrame.getDefaultGamma() / grabber.getGamma());
-		myframe.add(new JButton("飞行器控制面板"),BorderLayout.EAST);
+		MyFrame myframe = new MyFrame("camera", MyCanvasFrame.getDefaultGamma() / grabber.getGamma());
+		//withOperatePanel(myframe);
+		System.out.println("MyFrame is loaded...");
 		myframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myframe.setAlwaysOnTop(true);
-		Frame frame, aframe;
+		Frame frame;
 		while (myframe.isVisible() && (frame = grabber.grabFrame()) != null) {
 			myframe.showImage(frame);
-			recorder.record(frame);
-			aframe = grabber.grabSamples();
-			if (startTime == 0) {
-				startTime = System.currentTimeMillis();
-			}
-			if(aframe == null){
-				grabber.stop();
-				System.exit(0);
-			}
-			processAudio(aframe.samples);
-			//Thread.sleep(10);
+			//recorder.record(frame);
 		}
 		myframe.dispose();
 		grabber.stop();
-		recorder.stop();
+		//recorder.stop();
 	}
-	private void initSourceDataLine(FFmpegFrameGrabber fg) {
-		af = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,fg.getSampleRate(),16,fg.getAudioChannels(),fg.getAudioChannels()*2,fg.getSampleRate(),true);
-		dataLineInfo = new DataLine.Info(SourceDataLine.class,
-				af, AudioSystem.NOT_SPECIFIED);
-		try {
-			sourceDataLine = (SourceDataLine)AudioSystem.getLine(dataLineInfo);
-			sourceDataLine.open(af);
-			sourceDataLine.start();
-		} catch (LineUnavailableException e) {
-			e.printStackTrace();
-		}
+	public static void withOperatePanel(MyCanvasFrame myframe){
+		FrameUtil.initFrame(myframe, 1200, 600);
+		myframe.setResizable(false);
+
+		//使用BorderLayout布局方式，无法自定义按钮大小
+		/*JPanel EjPanel = new JPanel();
+		EjPanel.setPreferredSize(new Dimension(300, 100));
+		EjPanel.setLayout(new BorderLayout());
+		myframe.add(EjPanel, BorderLayout.EAST);
+
+		JButton CjButton = new JButton("中");
+		CjButton.setBounds(1000, 300, 80, 80);
+		CjButton.setPreferredSize(new Dimension(80, 80));
+		EjPanel.add(CjButton);
+
+		JPanel SjPanel = new JPanel();
+		SjPanel.setPreferredSize(new Dimension(300, 100));
+		SjPanel.setBackground(Color.RED);
+		myframe.add(SjPanel, BorderLayout.SOUTH);*/
+
+
+
+
+
 	}
-	public void processAudio(Buffer[] samples) {
-		buf = samples;
-		ILData = (ShortBuffer)buf[0];
-		TLData = shortToByteValue(ILData,vol);
-		tl = TLData.array();
-		sourceDataLine.write(tl,0,tl.length);
-	}
-	public static ByteBuffer shortToByteValue(ShortBuffer arr,float vol) {
-		int len  = arr.capacity();
-		ByteBuffer bb = ByteBuffer.allocate(len * 2);
-		for(int i = 0;i<len;i++){
-			bb.putShort(i*2,(short)((float)arr.get(i)*vol));
-		}
-		return bb;
+	public static void setIcon(String file,JButton com){
+		ImageIcon ico=new ImageIcon(file);
+		Image temp=ico.getImage().getScaledInstance(com.getWidth(),com.getHeight(),ico.getImage().SCALE_DEFAULT);
+		ico=new ImageIcon(temp);
+		com.setIcon(ico);
 	}
 }

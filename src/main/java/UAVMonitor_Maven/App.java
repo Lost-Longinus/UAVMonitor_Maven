@@ -23,63 +23,58 @@ public class App {
     float vol = 1;//音量
     byte[] tl;
 
-    public void getAudio(String audioPath) throws FrameGrabber.Exception {
+    public void getAudio(String audioPath) throws FrameGrabber.Exception, LineUnavailableException {
 
         System.out.println("START...");
         FFmpegFrameGrabber fg = new FFmpegFrameGrabber(audioPath);
-        System.out.println("音频： "+fg.hasAudio()+" 视频： "+fg.hasVideo());
-        int sec = 60;
+        //System.out.println("音频： "+fg.hasAudio()+" 视频： "+fg.hasVideo());
         Frame f;
         fg.start();
-        System.out.println("TimeStamp is "+fg.getTimestamp());
-        //fg.setTimestamp(sec*1000000);
+        //System.out.println("TimeStamp is "+fg.getTimestamp());
         int sampleFormat = fg.getSampleFormat();
-        System.out.println("audio format is "+sampleFormat);
-        //printMusicInfo(fg);
+        //System.out.println("audio format is "+sampleFormat);
         initSourceDataLine(fg);
         while(true){
             f = fg.grabFrame();
-            System.out.println(f == null);
-            if(f == null){
-                fg.stop();
-                System.exit(0);
-            }
             if(f.samples != null){
                 processAudio(f.samples);
             }
         }
     }
-    private void initSourceDataLine(FFmpegFrameGrabber fg) {
-        System.out.println("SampleRate : "+fg.getSampleRate());
-        System.out.println("AudioChannels : "+fg.getAudioChannels());
+    private void initSourceDataLine(FFmpegFrameGrabber fg) throws LineUnavailableException {
+        //System.out.println("SampleRate : "+fg.getSampleRate());
+        //System.out.println("AudioChannels : "+fg.getAudioChannels());
         af = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-                fg.getSampleRate(),16,fg.getAudioChannels(),
-                fg.getAudioChannels()*2,fg.getSampleRate(),true);
+                fg.getSampleRate()/2,16,2,
+                2*2,fg.getSampleRate(),true);
         dataLineInfo = new DataLine.Info(SourceDataLine.class,
                 af, AudioSystem.NOT_SPECIFIED);
-        try {
+
             sourceDataLine = (SourceDataLine)AudioSystem.getLine(dataLineInfo);
             sourceDataLine.open(af);
             sourceDataLine.start();
-        } catch (LineUnavailableException e) {
-            e.printStackTrace();
-        }
     }
     public void processAudio(Buffer[] samples) {
         buf = samples;
         ILData = (ShortBuffer)buf[0];
         TLData = shortToByteValue(ILData,vol);
         tl = TLData.array();
-        System.out.println("length of samples is "+tl.length);
+        //System.out.println("length of samples is "+tl.length);
         sourceDataLine.write(tl,0,tl.length);
-        System.out.println("audio is running...");
+        //System.out.println("audio is running...");
     }
     public static ByteBuffer shortToByteValue(ShortBuffer arr,float vol) {
         int len  = arr.capacity();
-        ByteBuffer bb = ByteBuffer.allocate(len * 2);
-        for(int i = 0;i<len;i++){
-            bb.putShort(i*2,(short)((float)arr.get(i)*vol));
+        ByteBuffer bb = ByteBuffer.allocate(len / 3);
+        for(int i = 0;i<len/6;i++){
+            short arrtemp = (short)((float)arr.get(i*6)*vol);
+            bb.putShort(i*2,arrtemp);
         }
+        /*ByteBuffer bb = ByteBuffer.allocate(len * 2);
+        for(int i = 0;i<len;i++){
+            short arrtemp = (short)((float)arr.get(i)*vol);
+            bb.putShort(i*2,arrtemp);
+        }*/
         return bb; // 默认转为大端序
     }
 }
