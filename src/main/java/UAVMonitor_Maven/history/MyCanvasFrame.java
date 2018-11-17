@@ -1,4 +1,4 @@
-package UAVMonitor_Maven;
+package UAVMonitor_Maven.history;
 //
 // Source code recreated from a .class file by IntelliJ IDEA
 // (powered by Fernflower decompiler)

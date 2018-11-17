@@ -1,4 +1,4 @@
-package UAVMonitor_Maven;
+package UAVMonitor_Maven.history;
 
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;

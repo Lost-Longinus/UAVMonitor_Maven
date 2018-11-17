@@ -1,14 +1,11 @@
-package UAVMonitor_Maven;
+package UAVMonitor_Maven.history;
 
 import org.bytedeco.javacpp.Loader;
-import org.bytedeco.javacpp.avcodec;
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_objdetect;
 import org.bytedeco.javacv.*;
 import org.bytedeco.javacv.Frame;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * Hello world!

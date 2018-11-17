@@ -1,4 +1,4 @@
-package UAVMonitor_Maven;
+package UAVMonitor_Maven.history;
 
 import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacpp.avcodec;

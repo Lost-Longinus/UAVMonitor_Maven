@@ -9,11 +9,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
-/**
- * Hello world!
- *
- */
-public class App {
+public class Audio {
     private AudioFormat af = null;
     private SourceDataLine sourceDataLine;
     private DataLine.Info dataLineInfo;
